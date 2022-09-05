@@ -31,17 +31,18 @@ func NewAutomataDisplay(width, height int) *AutomataDisplay {
 }
 
 func (adsp *AutomataDisplay) automataToSprite() *pixel.Sprite {
+	//create empty PictureData(black by default)
 	pic := pixel.MakePictureData(adsp.cfg.Bounds)
+	//iterate through the automata matrix and if a cell is active, change the pixel's color
 	matrix := adsp.automata.GetMatrix().Mat
 	for i := 0; i < adsp.automata.W(); i++ {
 		for j := 0; j < adsp.automata.H(); j++ {
 			if matrix[i][j] == true {
 				pic.Pix[i+j*adsp.automata.W()] = color.RGBA{R: 255, G: 255, B: 255, A: 255}
-			} else {
-				pic.Pix[i+j*adsp.automata.W()] = color.RGBA{A: 255}
 			}
 		}
 	}
+	//create sprite and return it
 	sprite := pixel.NewSprite(pic, pic.Bounds())
 	return sprite
 }
@@ -52,17 +53,6 @@ func (adsp *AutomataDisplay) Run() {
 		sprite := adsp.automataToSprite()
 		sprite.Draw(adsp.win, pixel.IM.Moved(adsp.win.Bounds().Center()))
 		adsp.win.Update()
-		adsp.automata.Step()
-	}
-}
-
-func (adsp *AutomataDisplay) RunMT() {
-	adsp.automata.InitMT()
-	for !adsp.win.Closed() {
-		adsp.win.Clear(colornames.Black)
-		sprite := adsp.automataToSprite()
-		sprite.Draw(adsp.win, pixel.IM.Moved(adsp.win.Bounds().Center()))
-		adsp.win.Update()
-		adsp.automata.Step()
+		adsp.automata.StepMT()
 	}
 }

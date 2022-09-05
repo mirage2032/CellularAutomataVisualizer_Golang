@@ -40,17 +40,17 @@ func (automata *cgol) countCellNeighbours(x, y int) {
 	currentCellNeighbours := &automata.neighbourCount.Mat[x][y]
 	*currentCellNeighbours = 0
 	for i := x - 1; i <= x+1; i++ {
-		if i < 0 || i >= automata.width {
+		if i < 0 || i >= automata.width { //ignore cells out of bounds on X axis
 			continue
 		}
 		for j := y - 1; j <= y+1; j++ {
-			if j < 0 || j >= automata.height {
+			if j < 0 || j >= automata.height { //ignore cells out of bounds on Y axis
 				continue
 			}
-			if x == i && y == j {
+			if x == i && y == j { //don't count itself as neighbour
 				continue
 			}
-			if automata.Mat.Mat[i][j] == true {
+			if automata.Mat.Mat[i][j] {
 				*currentCellNeighbours++
 			}
 		}
@@ -96,16 +96,15 @@ func (automata *cgol) Step() {
 	automata.updateCells()
 }
 
-func (automata *cgol) InitMT() {
-
-}
-
 func (automata *cgol) StepMT() {
 	if automata.H() < automata.threads {
 		automata.Step()
 		return
 	}
+	//Split the Y axis (height) into segments and assign a segment to each thread.
+	//Each thread will calculate the neighbours of the cells assigned to it and then update the cells accordingly
 	var wg sync.WaitGroup
+
 	for _, limit := range automata.limits.Limits {
 		wg.Add(1)
 		limit := limit

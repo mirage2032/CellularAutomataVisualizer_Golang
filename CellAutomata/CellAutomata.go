@@ -9,7 +9,6 @@ type cellAutomataBase struct {
 
 type CellAutomata interface {
 	Step()
-	InitMT()
 	StepMT()
 	Randomize()
 	GetMatrix() *Matrix2D.Matrix2D[bool]
