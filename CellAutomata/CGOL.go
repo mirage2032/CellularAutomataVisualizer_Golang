@@ -12,6 +12,8 @@ type cgol struct {
 	neighbourCount *Matrix2D.Matrix2D[uint8]
 	limits         Limits
 	threads        int
+	wgCountN       sync.WaitGroup
+	wgUpdCell      sync.WaitGroup
 }
 
 func NewCGOL(width, height int) *cgol {

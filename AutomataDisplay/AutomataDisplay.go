@@ -5,7 +5,6 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
-	"image/color"
 )
 
 type AutomataDisplay struct {
@@ -19,6 +18,7 @@ func NewAutomataDisplay(width, height int) *AutomataDisplay {
 	adsp.cfg = pixelgl.WindowConfig{
 		Title:  "AUTOMATA",
 		Bounds: pixel.R(0, 0, float64(width), float64(height)),
+		VSync:  false,
 	}
 	win, err := pixelgl.NewWindow(adsp.cfg)
 	if err != nil {
@@ -38,7 +38,7 @@ func (adsp *AutomataDisplay) automataToSprite() *pixel.Sprite {
 	for i := 0; i < adsp.automata.W(); i++ {
 		for j := 0; j < adsp.automata.H(); j++ {
 			if matrix[i][j] == true {
-				pic.Pix[i+j*adsp.automata.W()] = color.RGBA{R: 255, G: 255, B: 255, A: 255}
+				pic.Pix[(i + j*adsp.automata.W())] = colornames.White
 			}
 		}
 	}
