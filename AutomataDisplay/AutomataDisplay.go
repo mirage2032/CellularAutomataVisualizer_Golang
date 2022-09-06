@@ -16,9 +16,10 @@ type AutomataDisplay struct {
 func NewAutomataDisplay(width, height int) *AutomataDisplay {
 	adsp := new(AutomataDisplay)
 	adsp.cfg = pixelgl.WindowConfig{
-		Title:  "AUTOMATA",
-		Bounds: pixel.R(0, 0, float64(width), float64(height)),
-		VSync:  false,
+		Title:       "Automata",
+		Bounds:      pixel.R(0, 0, float64(width), float64(height)),
+		VSync:       false,
+		Undecorated: true,
 	}
 	win, err := pixelgl.NewWindow(adsp.cfg)
 	if err != nil {
@@ -30,29 +31,39 @@ func NewAutomataDisplay(width, height int) *AutomataDisplay {
 	return adsp
 }
 
-func (adsp *AutomataDisplay) automataToSprite() *pixel.Sprite {
-	//create empty PictureData(black by default)
-	pic := pixel.MakePictureData(adsp.cfg.Bounds)
+func (adsp *AutomataDisplay) automataToCanvas() *pixelgl.Canvas {
+	//create empty Canvas(black by default)
+	pic := pixelgl.NewCanvas(adsp.cfg.Bounds)
+	pixels := pic.Pixels()
 	//iterate through the automata matrix and if a cell is active, change the pixel's color
 	matrix := adsp.automata.GetMatrix().Mat
 	for i := 0; i < adsp.automata.W(); i++ {
 		for j := 0; j < adsp.automata.H(); j++ {
 			if matrix[i][j] == true {
-				pic.Pix[(i + j*adsp.automata.W())] = colornames.White
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4] = 255   //red channel
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+1] = 255 //red channel
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+2] = 255 //red channel
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+3] = 255 //alpha channel
 			}
 		}
 	}
-	//create sprite and return it
-	sprite := pixel.NewSprite(pic, pic.Bounds())
-	return sprite
+	pic.SetPixels(pixels)
+	return pic
+}
+
+func (adsp *AutomataDisplay) handleInput() {
+	if adsp.win.Pressed(pixelgl.KeyEscape) {
+		adsp.win.SetClosed(true)
+	}
 }
 
 func (adsp *AutomataDisplay) Run() {
 	for !adsp.win.Closed() {
 		adsp.win.Clear(colornames.Black)
-		sprite := adsp.automataToSprite()
+		sprite := adsp.automataToCanvas()
 		sprite.Draw(adsp.win, pixel.IM.Moved(adsp.win.Bounds().Center()))
 		adsp.win.Update()
+		adsp.handleInput()
 		adsp.automata.StepMT()
 	}
 }

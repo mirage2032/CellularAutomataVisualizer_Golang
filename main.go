@@ -3,13 +3,15 @@ package main
 import (
 	"awesomeProject/AutomataDisplay"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/fstanis/screenresolution"
 	"math/rand"
 	"time"
 )
 
 func run() {
 	rand.Seed(time.Now().Unix())
-	autoDisp := AutomataDisplay.NewAutomataDisplay(1920/5, 1080/5)
+	resolution := screenresolution.GetPrimary()
+	autoDisp := AutomataDisplay.NewAutomataDisplay(resolution.Width, resolution.Height)
 	autoDisp.Run()
 }
 
