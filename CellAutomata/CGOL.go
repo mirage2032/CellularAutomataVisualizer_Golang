@@ -21,13 +21,13 @@ func NewCGOL(width, height int) *cgol {
 	automata.cellAutomataBase = newCellAutomataBase(width, height)
 	automata.neighbourCount = Matrix2D.NewMatrix2D[uint8](width, height)
 	automata.threads = runtime.NumCPU()
-	automata.limits = NewLimits(height, automata.threads)
+	automata.limits = NewLimits(height-1, automata.threads)
 	return automata
 }
 
 func (automata *cgol) Randomize() {
-	for x := 0; x < automata.width; x++ {
-		for y := 0; y < automata.height; y++ {
+	for x := 1; x < automata.width-1; x++ {
+		for y := 1; y < automata.height-1; y++ {
 			cell := &automata.Mat.Mat[x][y]
 			if rand.Intn(2) == 1 {
 				*cell = true
@@ -42,13 +42,7 @@ func (automata *cgol) countCellNeighbours(x, y int) {
 	currentCellNeighbours := &automata.neighbourCount.Mat[x][y]
 	*currentCellNeighbours = 0
 	for i := x - 1; i <= x+1; i++ {
-		if i < 0 || i >= automata.width { //ignore cells out of bounds on X axis
-			continue
-		}
 		for j := y - 1; j <= y+1; j++ {
-			if j < 0 || j >= automata.height { //ignore cells out of bounds on Y axis
-				continue
-			}
 			if x == i && y == j { //don't count itself as neighbour
 				continue
 			}
@@ -60,7 +54,7 @@ func (automata *cgol) countCellNeighbours(x, y int) {
 }
 
 func (automata *cgol) countMTNeighbours(y1 int, y2 int) {
-	for i := 0; i < automata.width; i++ {
+	for i := 1; i < automata.width-1; i++ {
 		for j := y1; j < y2; j++ {
 			automata.countCellNeighbours(i, j)
 		}
@@ -82,7 +76,7 @@ func (automata *cgol) updateCell(x, y int) {
 }
 
 func (automata *cgol) updateMTCells(y1 int, y2 int) {
-	for i := 0; i < automata.width; i++ {
+	for i := 1; i < automata.width-1; i++ {
 		for j := y1; j < y2; j++ {
 			automata.updateCell(i, j)
 		}
@@ -90,7 +84,7 @@ func (automata *cgol) updateMTCells(y1 int, y2 int) {
 }
 
 func (automata *cgol) updateCells() {
-	automata.updateMTCells(0, automata.height)
+	automata.updateMTCells(1, automata.height-1)
 }
 
 func (automata *cgol) Step() {
@@ -99,7 +93,7 @@ func (automata *cgol) Step() {
 }
 
 func (automata *cgol) StepMT() {
-	if automata.H() < automata.threads {
+	if automata.height-2 < automata.threads {
 		automata.Step()
 		return
 	}

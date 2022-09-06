@@ -37,8 +37,14 @@ func (adsp *AutomataDisplay) automataToCanvas() *pixelgl.Canvas {
 	pixels := pic.Pixels()
 	//iterate through the automata matrix and if a cell is active, change the pixel's color
 	matrix := adsp.automata.GetMatrix().Mat
-	for i := 0; i < adsp.automata.W(); i++ {
-		for j := 0; j < adsp.automata.H(); j++ {
+	for i := 0; i < int(adsp.cfg.Bounds.Max.X); i++ {
+		for j := 0; j < int(adsp.cfg.Bounds.Max.Y); j++ {
+			if i == 0 || j == 0 || i == int(adsp.cfg.Bounds.Max.X)-1 || j == int(adsp.cfg.Bounds.Max.Y)-1 {
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4] = 255   //red channel
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+1] = 0   //red channel
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+2] = 0   //red channel
+				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+3] = 255 //alpha channel
+			}
 			if matrix[i][j] == true {
 				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4] = 255   //red channel
 				pixels[(i+j*int(adsp.cfg.Bounds.Max.X))*4+1] = 255 //red channel

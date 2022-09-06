@@ -12,15 +12,6 @@ type CellAutomata interface {
 	StepMT()
 	Randomize()
 	GetMatrix() *Matrix2D.Matrix2D[bool]
-	W() int
-	H() int
-}
-
-func (automata *cellAutomataBase) W() int {
-	return automata.width
-}
-func (automata *cellAutomataBase) H() int {
-	return automata.height
 }
 
 func (automata *cellAutomataBase) GetMatrix() *Matrix2D.Matrix2D[bool] {

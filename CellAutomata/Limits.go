@@ -5,9 +5,9 @@ type Limits struct {
 }
 
 func NewLimits(max int, chunks int) Limits {
-	var array = make([]int, max)
-	for i := 0; i < max; i++ {
-		array[i] = i
+	var array = make([]int, max-1)
+	for i := 1; i < max; i++ {
+		array[i-1] = i
 	}
 	var result [][]int
 
