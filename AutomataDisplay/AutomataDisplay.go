@@ -9,8 +9,8 @@ import (
 
 type AutomataDisplay struct {
 	cfg      pixelgl.WindowConfig
-	win      *pixelgl.Window
-	automata CellAutomata.CellAutomata
+	Win      *pixelgl.Window
+	Automata CellAutomata.CellAutomata
 }
 
 func NewAutomataDisplay(width, height int) *AutomataDisplay {
@@ -25,9 +25,9 @@ func NewAutomataDisplay(width, height int) *AutomataDisplay {
 	if err != nil {
 		panic(err)
 	}
-	adsp.automata = CellAutomata.NewCGOL(width, height)
-	adsp.automata.Randomize()
-	adsp.win = win
+	adsp.Automata = CellAutomata.NewCGOL(width, height)
+	adsp.Automata.Randomize()
+	adsp.Win = win
 	return adsp
 }
 
@@ -35,8 +35,8 @@ func (adsp *AutomataDisplay) automataToCanvas() *pixelgl.Canvas {
 	//create empty Canvas(black by default)
 	pic := pixelgl.NewCanvas(adsp.cfg.Bounds)
 	pixels := pic.Pixels()
-	//iterate through the automata matrix and if a cell is active, change the pixel's color
-	matrix := adsp.automata.GetMatrix().Mat
+	//iterate through the Automata matrix and if a cell is active, change the pixel's color
+	matrix := adsp.Automata.GetMatrix().Mat
 	for i := 0; i < int(adsp.cfg.Bounds.Max.X); i++ {
 		for j := 0; j < int(adsp.cfg.Bounds.Max.Y); j++ {
 			if i == 0 || j == 0 || i == int(adsp.cfg.Bounds.Max.X)-1 || j == int(adsp.cfg.Bounds.Max.Y)-1 {
@@ -57,19 +57,23 @@ func (adsp *AutomataDisplay) automataToCanvas() *pixelgl.Canvas {
 	return pic
 }
 
-func (adsp *AutomataDisplay) handleInput() {
-	if adsp.win.Pressed(pixelgl.KeyEscape) {
-		adsp.win.SetClosed(true)
+func (adsp *AutomataDisplay) HandleInput() {
+	if adsp.Win.Pressed(pixelgl.KeyEscape) {
+		adsp.Win.SetClosed(true)
 	}
 }
 
+func (adsp *AutomataDisplay) Render() {
+	adsp.Win.Clear(colornames.Black)
+	sprite := adsp.automataToCanvas()
+	sprite.Draw(adsp.Win, pixel.IM.Moved(adsp.Win.Bounds().Center()))
+	adsp.Win.Update()
+}
+
 func (adsp *AutomataDisplay) Run() {
-	for !adsp.win.Closed() {
-		adsp.win.Clear(colornames.Black)
-		sprite := adsp.automataToCanvas()
-		sprite.Draw(adsp.win, pixel.IM.Moved(adsp.win.Bounds().Center()))
-		adsp.win.Update()
-		adsp.handleInput()
-		adsp.automata.StepMT()
+	for !adsp.Win.Closed() {
+		adsp.Render()
+		adsp.HandleInput()
+		adsp.Automata.StepMT()
 	}
 }
